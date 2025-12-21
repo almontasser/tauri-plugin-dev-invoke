@@ -1,0 +1,28 @@
+{
+    "name": "tauri-plugin-dev-invoke-api",
+    "version": "0.1.0",
+    "description": "JavaScript API for tauri-plugin-dev-invoke",
+    "type": "module",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "files": [
+        "dist",
+        "README.md"
+    ],
+    "scripts": {
+        "build": "tsc"
+    },
+    "devDependencies": {
+        "typescript": "^5.0.0"
+    },
+    "peerDependencies": {
+        "@tauri-apps/api": "^2.0.0"
+    },
+    "keywords": [
+        "tauri",
+        "plugin",
+        "dev",
+        "testing"
+    ],
+    "license": "MIT"
+}
