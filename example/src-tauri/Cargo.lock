@@ -3647,7 +3647,7 @@ dependencies = [
 
 [[package]]
 name = "tauri-plugin-dev-invoke"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "paste",
  "serde",
@@ -3659,7 +3659,7 @@ dependencies = [
 
 [[package]]
 name = "tauri-plugin-dev-invoke-macros"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "proc-macro2",
  "quote",
