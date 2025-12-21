@@ -1,5 +1,8 @@
 [package]
 name = "tauri-plugin-dev-invoke"
+authors = ["Mahmoud Almontasser <almontasser@outlook.com>"]
+repository = "https://github.com/almontasser/tauri-plugin-dev-invoke"
+homepage = "https://github.com/almontasser/tauri-plugin-dev-invoke"
 version = "0.1.0"
 edition = "2021"
 description = "Enables external browsers to invoke Tauri commands via HTTP for dev/testing"

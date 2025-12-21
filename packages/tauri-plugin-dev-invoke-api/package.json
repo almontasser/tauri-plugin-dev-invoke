@@ -2,6 +2,7 @@
     "name": "tauri-plugin-dev-invoke-api",
     "version": "0.1.0",
     "description": "JavaScript API for tauri-plugin-dev-invoke",
+    "author": "Mahmoud Almontasser <almontasser@outlook.com>",
     "type": "module",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
