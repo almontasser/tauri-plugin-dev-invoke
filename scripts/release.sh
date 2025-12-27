@@ -60,7 +60,17 @@ if [[ -f "$JS_PACKAGE" ]]; then
   sed -i '' "s/\"version\": \"[^\"]*\"/\"version\": \"$NEW_VERSION\"/" "$JS_PACKAGE"
 fi
 
-# Build and test
+# Update version in README files
+echo -e "${YELLOW}Updating README files...${NC}"
+ROOT_README="$ROOT_DIR/README.md"
+PACKAGE_README="$ROOT_DIR/packages/tauri-plugin-dev-invoke/README.md"
+
+for readme in "$ROOT_README" "$PACKAGE_README"; do
+  if [[ -f "$readme" ]]; then
+    # Update version in dependency examples like: tauri-plugin-dev-invoke = "0.2"
+    sed -i '' "s/tauri-plugin-dev-invoke = \"[0-9]*\.[0-9]*\"/tauri-plugin-dev-invoke = \"$MAJOR.$MINOR\"/" "$readme"
+  fi
+done
 echo -e "${YELLOW}Building and testing...${NC}"
 cd "$ROOT_DIR/packages/tauri-plugin-dev-invoke"
 cargo check
