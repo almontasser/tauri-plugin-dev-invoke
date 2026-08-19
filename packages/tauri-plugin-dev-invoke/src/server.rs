@@ -75,9 +75,36 @@ pub(crate) fn plugin<R: Runtime>(mut config: Config) -> TauriPlugin<R> {
         .replace("__TEMPLATE_endpoint__", &endpoint)
         .replace("__TEMPLATE_bridge_event__", BRIDGE_EVENT);
 
+    let headless = config.headless;
+
     PluginBuilder::new("dev-invoke")
         .js_init_script(script)
+        // Hidden as early as the plugin can reach them. The windows still load the frontend
+        // and still relay callbacks; headless only means they are off screen.
+        .on_webview_ready(move |webview| {
+            if headless {
+                if let Err(e) = webview.window().hide() {
+                    eprintln!(
+                        "[dev-invoke] could not hide window `{}`: {e}",
+                        webview.label()
+                    );
+                }
+            }
+        })
         .setup(move |app, _api| {
+            if config.headless {
+                // Without this the app keeps a Dock icon and steals focus on launch, which
+                // rather defeats the point.
+                #[cfg(target_os = "macos")]
+                if let Err(e) = app.set_activation_policy(tauri::ActivationPolicy::Accessory) {
+                    eprintln!("[dev-invoke] could not detach from the Dock: {e}");
+                }
+                println!(
+                    "[dev-invoke] headless: app windows are hidden, they still relay events \
+                     and channels to the browser"
+                );
+            }
+
             let state = Inner::new(app.clone(), config);
 
             // Fallback transport: the host webview emits this when a CSP keeps it from
@@ -106,6 +133,8 @@ const HOST_ENV: &str = "DEV_INVOKE_HOST";
 const PORT_ENV: &str = "DEV_INVOKE_PORT";
 /// Replaces the origin allowlist with a comma-separated list, or `*` for any origin.
 const ORIGINS_ENV: &str = "DEV_INVOKE_ALLOWED_ORIGINS";
+/// Hides the app's windows.
+const HEADLESS_ENV: &str = "DEV_INVOKE_HEADLESS";
 
 /// Applies the `DEV_INVOKE_*` variables on top of the builder's values.
 ///
@@ -139,6 +168,18 @@ fn apply_env_overrides(config: &mut Config, var: impl Fn(&str) -> Option<String>
         }
     }
 
+    if let Some(raw) = var(HEADLESS_ENV) {
+        let value = raw.trim();
+        match parse_bool(value) {
+            Some(headless) => config.headless = headless,
+            None => ignored(
+                HEADLESS_ENV,
+                value,
+                "expected 1/true/yes/on or 0/false/no/off",
+            ),
+        }
+    }
+
     if let Some(raw) = var(ORIGINS_ENV) {
         let value = raw.trim();
         let origins: Vec<String> = value
@@ -164,6 +205,14 @@ fn apply_env_overrides(config: &mut Config, var: impl Fn(&str) -> Option<String>
 
 fn ignored(name: &str, value: &str, reason: &str) {
     eprintln!("[dev-invoke] ignoring {name}={value:?}: {reason}");
+}
+
+fn parse_bool(value: &str) -> Option<bool> {
+    match value.to_ascii_lowercase().as_str() {
+        "1" | "true" | "yes" | "on" => Some(true),
+        "0" | "false" | "no" | "off" => Some(false),
+        _ => None,
+    }
 }
 
 fn parse_host(value: &str) -> Option<IpAddr> {
@@ -1052,6 +1101,32 @@ mod tests {
         assert_eq!(config.host, IpAddr::V4(Ipv4Addr::LOCALHOST));
         assert_eq!(config.port, DEFAULT_PORT);
         assert_eq!(config.origins, OriginPolicy::Auto);
+    }
+
+    #[test]
+    fn parses_headless_flags() {
+        for value in ["1", "true", "TRUE", "yes", "on"] {
+            let mut config = Config::default();
+            apply_env_overrides(&mut config, env(&[(HEADLESS_ENV, value)]));
+            assert!(config.headless, "{value} should enable headless");
+        }
+
+        for value in ["0", "false", "no", "off"] {
+            let mut config = Config {
+                headless: true,
+                ..Default::default()
+            };
+            apply_env_overrides(&mut config, env(&[(HEADLESS_ENV, value)]));
+            assert!(!config.headless, "{value} should disable headless");
+        }
+
+        // An unrecognised value must not be read as "off" and silently un-hide the windows.
+        let mut config = Config {
+            headless: true,
+            ..Default::default()
+        };
+        apply_env_overrides(&mut config, env(&[(HEADLESS_ENV, "maybe")]));
+        assert!(config.headless);
     }
 
     #[test]
