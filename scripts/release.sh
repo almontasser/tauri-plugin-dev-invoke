@@ -105,7 +105,7 @@ if [[ -f "$JS_PACKAGE" ]]; then
   cd "$ROOT_DIR/packages/tauri-plugin-dev-invoke-api"
   # `npm publish` triggers `prepublishOnly`, which compiles the package and therefore needs
   # its devDependencies on disk. A fresh clone has none.
-  npm install
+  npm ci
   npm publish
 fi
 
