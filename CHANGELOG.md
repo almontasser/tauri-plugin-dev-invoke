@@ -19,6 +19,10 @@ and the npm package share a version number.
 
 - The API package's lockfile is tracked and the release script installs with `npm ci`, so a
   published build is compiled against pinned dependencies.
+- `scripts/release.sh` now publishes before it pushes, so a failed publish can no longer leave
+  a tag on GitHub for a release that does not exist. It also preflights the branch, working
+  tree, tag and credentials, requires a non-empty `## [Unreleased]` section and rolls it into
+  the new version, verifies every version rewrite actually applied, and takes `--dry-run`.
 
 ## [0.3.0] - 2026-08-19
 
