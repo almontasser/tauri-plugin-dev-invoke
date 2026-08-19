@@ -3,14 +3,25 @@ name = "tauri-plugin-dev-invoke"
 authors = ["Mahmoud Almontasser <almontasser@outlook.com>"]
 repository = "https://github.com/almontasser/tauri-plugin-dev-invoke"
 homepage = "https://github.com/almontasser/tauri-plugin-dev-invoke"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2021"
-description = "Enables external browsers to invoke Tauri commands via HTTP for dev/testing"
+rust-version = "1.77"
+description = "Run your Tauri app in a browser during development: commands, events, channels and assets over HTTP"
 license = "MIT OR Apache-2.0"
 keywords = ["tauri", "plugin", "dev", "testing", "invoke"]
+categories = ["development-tools", "web-programming::http-server"]
+
+[features]
+# Allows `Builder::enabled_in_release` to actually start the server. Without it the server
+# is not compiled into release builds at all.
+allow-in-release = []
 
 [dependencies]
 tauri = { version = "2", default-features = false }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 tiny_http = "0.12"
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
