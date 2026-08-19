@@ -64,8 +64,9 @@ fi
 echo -e "${YELLOW}Updating README files...${NC}"
 ROOT_README="$ROOT_DIR/README.md"
 PACKAGE_README="$ROOT_DIR/packages/tauri-plugin-dev-invoke/README.md"
+API_README="$ROOT_DIR/packages/tauri-plugin-dev-invoke-api/README.md"
 
-for readme in "$ROOT_README" "$PACKAGE_README"; do
+for readme in "$ROOT_README" "$PACKAGE_README" "$API_README"; do
   if [[ -f "$readme" ]]; then
     # Update version in dependency examples like: tauri-plugin-dev-invoke = "0.2"
     sed -i '' "s/tauri-plugin-dev-invoke = \"[0-9]*\.[0-9]*\"/tauri-plugin-dev-invoke = \"$MAJOR.$MINOR\"/" "$readme"
@@ -73,7 +74,9 @@ for readme in "$ROOT_README" "$PACKAGE_README"; do
 done
 echo -e "${YELLOW}Building and testing...${NC}"
 cd "$ROOT_DIR/packages/tauri-plugin-dev-invoke"
-cargo check
+cargo fmt --check
+cargo clippy --all-targets --all-features -- -D warnings
+cargo test
 cargo build --release
 
 # Commit changes
@@ -100,6 +103,9 @@ cargo publish
 if [[ -f "$JS_PACKAGE" ]]; then
   echo -e "${YELLOW}Publishing to npm...${NC}"
   cd "$ROOT_DIR/packages/tauri-plugin-dev-invoke-api"
+  # `npm publish` triggers `prepublishOnly`, which compiles the package and therefore needs
+  # its devDependencies on disk. A fresh clone has none.
+  npm install
   npm publish
 fi
 
