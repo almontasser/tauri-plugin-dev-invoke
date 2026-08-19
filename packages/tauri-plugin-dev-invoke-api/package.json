@@ -1,6 +1,6 @@
 {
     "name": "tauri-plugin-dev-invoke-api",
-    "version": "0.3.0",
+    "version": "0.3.1",
     "description": "Run your Tauri app in a browser during development: commands, events, channels and assets over HTTP",
     "author": "Mahmoud Almontasser <almontasser@outlook.com>",
     "license": "MIT OR Apache-2.0",

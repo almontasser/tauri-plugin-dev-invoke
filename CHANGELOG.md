@@ -8,6 +8,8 @@ and the npm package share a version number.
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-08-19
+
 ### Added
 
 - **Headless mode** via `Builder::headless` or `DEV_INVOKE_HEADLESS`, for working entirely in
@@ -97,7 +99,8 @@ Browser sessions now reach the whole Tauri IPC surface, not just `invoke()`.
 - Initial release: invoke Tauri commands over HTTP from an external browser.
 
 [#1]: https://github.com/almontasser/tauri-plugin-dev-invoke/issues/1
-[Unreleased]: https://github.com/almontasser/tauri-plugin-dev-invoke/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/almontasser/tauri-plugin-dev-invoke/compare/v0.3.1...HEAD
+[0.3.1]: https://github.com/almontasser/tauri-plugin-dev-invoke/releases/tag/v0.3.1
 [0.3.0]: https://github.com/almontasser/tauri-plugin-dev-invoke/releases/tag/v0.3.0
 [0.2.0]: https://github.com/almontasser/tauri-plugin-dev-invoke/releases/tag/v0.2.0
 [0.1.0]: https://github.com/almontasser/tauri-plugin-dev-invoke/releases/tag/v0.1.0
