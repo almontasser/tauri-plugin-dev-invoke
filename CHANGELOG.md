@@ -6,6 +6,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). The Rust crate
 and the npm package share a version number.
 
+## [Unreleased]
+
+### Added
+
+- **Headless mode** via `Builder::headless` or `DEV_INVOKE_HEADLESS`, for working entirely in
+  a browser tab. The app's windows are hidden as they are created; they keep loading the
+  frontend and relaying events and channels, since that is what the browser depends on. On
+  macOS the app also drops out of the Dock and stops taking focus.
+
+### Changed
+
+- The API package's lockfile is tracked and the release script installs with `npm ci`, so a
+  published build is compiled against pinned dependencies.
+- `scripts/release.sh` now publishes before it pushes, so a failed publish can no longer leave
+  a tag on GitHub for a release that does not exist. It also preflights the branch, working
+  tree, tag and credentials, requires a non-empty `## [Unreleased]` section and rolls it into
+  the new version, verifies every version rewrite actually applied, and takes `--dry-run`.
+
 ## [0.3.0] - 2026-08-19
 
 Browser sessions now reach the whole Tauri IPC surface, not just `invoke()`.
@@ -79,6 +97,7 @@ Browser sessions now reach the whole Tauri IPC surface, not just `invoke()`.
 - Initial release: invoke Tauri commands over HTTP from an external browser.
 
 [#1]: https://github.com/almontasser/tauri-plugin-dev-invoke/issues/1
+[Unreleased]: https://github.com/almontasser/tauri-plugin-dev-invoke/compare/v0.3.0...HEAD
 [0.3.0]: https://github.com/almontasser/tauri-plugin-dev-invoke/releases/tag/v0.3.0
 [0.2.0]: https://github.com/almontasser/tauri-plugin-dev-invoke/releases/tag/v0.2.0
 [0.1.0]: https://github.com/almontasser/tauri-plugin-dev-invoke/releases/tag/v0.1.0

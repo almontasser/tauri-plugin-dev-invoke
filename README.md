@@ -101,6 +101,7 @@ tauri::Builder::default()
             .allow_origin("http://localhost:5173")   // extra browser origin
             .serve_assets(true)                      // convertFileSrc() over HTTP
             .timeout(Duration::from_secs(600))       // per-command deadline
+            .headless(false)                         // hide the app windows
             .build(),
     )
 ```
@@ -126,10 +127,28 @@ server:
 | `DEV_INVOKE_HOST` | `Builder::host` | `0.0.0.0`, or `localhost` |
 | `DEV_INVOKE_PORT` | `Builder::port` | `3031` |
 | `DEV_INVOKE_ALLOWED_ORIGINS` | `Builder::allowed_origins` | `http://localhost:5173,http://192.168.1.10:1420`, or `*` |
+| `DEV_INVOKE_HEADLESS` | `Builder::headless` | `1`, `true`, `yes`, `on` — or the negatives |
 
 The environment **wins over the builder**, so a hard-coded `.port(3030)` can still be
 overridden at launch. Unset variables change nothing, and a value that does not parse is
 reported on stderr and ignored rather than silently falling back.
+
+### Working in the browser only
+
+If you are developing entirely in a browser tab, the app window is just in the way. Headless
+mode hides it:
+
+```bash
+DEV_INVOKE_HEADLESS=1 npm run tauri dev
+```
+
+The window is **not** closed, and cannot be — it still loads your frontend and it is what
+relays events and channel messages to the browser. Headless only means you do not have to look
+at it. On macOS the app also drops out of the Dock and stops taking focus on launch.
+
+Windows are hidden as they are created, so depending on the platform you may still catch a
+brief flash. Setting `"visible": false` on the window in `tauri.conf.json` avoids that
+entirely, at the cost of being a config change rather than a per-run flag.
 
 ### Running several instances at once
 
@@ -228,7 +247,8 @@ Keep it on loopback.
 
 ## Limitations
 
-- Your app window must be open — it relays Rust → JS callbacks to the browser.
+- Your app window must be running — it relays Rust → JS callbacks to the browser. It can be
+  hidden (see [headless mode](#working-in-the-browser-only)), but not closed.
 - `withGlobalTauri` is not shimmed; import from `@tauri-apps/api` instead of `window.__TAURI__`.
 - Window-level events (`tauri://resize`, `tauri://focus`, drag and drop) describe the *app
   window*, not the browser tab, because that is the window the browser impersonates.

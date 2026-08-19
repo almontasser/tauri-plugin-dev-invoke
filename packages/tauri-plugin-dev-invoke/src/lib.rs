@@ -48,6 +48,7 @@
 //! | `DEV_INVOKE_HOST` | [`Builder::host`] — an IP address, or `localhost` |
 //! | `DEV_INVOKE_PORT` | [`Builder::port`] |
 //! | `DEV_INVOKE_ALLOWED_ORIGINS` | [`Builder::allowed_origins`] — comma-separated, or `*` for any |
+//! | `DEV_INVOKE_HEADLESS` | [`Builder::headless`] — `1`/`true`/`yes`/`on`, or the negatives |
 //!
 //! The environment wins over the builder, so a hard-coded `.port()` can still be overridden
 //! at launch. A value that does not parse is reported on stderr and ignored.
@@ -119,6 +120,8 @@ pub struct Config {
     pub timeout: Duration,
     /// Run the server in release builds. Requires the `allow-in-release` cargo feature.
     pub enabled_in_release: bool,
+    /// Hide the app's windows so it runs as a background relay.
+    pub headless: bool,
 }
 
 impl Default for Config {
@@ -132,6 +135,7 @@ impl Default for Config {
             serve_assets: true,
             timeout: Duration::from_secs(600),
             enabled_in_release: false,
+            headless: false,
         }
     }
 }
@@ -219,6 +223,21 @@ impl Builder {
     /// minutes.
     pub fn timeout(mut self, timeout: Duration) -> Self {
         self.config.timeout = timeout;
+        self
+    }
+
+    /// Hides the app's windows, so the app runs as a background relay for the browser.
+    ///
+    /// The window is not closed and cannot be: it still loads your frontend, and it is what
+    /// relays events and channel messages to the browser. Headless only means you do not have
+    /// to look at it. On macOS the app also drops out of the Dock and stops taking focus.
+    ///
+    /// Windows are hidden as they are created, which can leave a brief flash on screen. Set
+    /// `"visible": false` on the window in `tauri.conf.json` to avoid it entirely.
+    ///
+    /// Overridden by the `DEV_INVOKE_HEADLESS` environment variable.
+    pub fn headless(mut self, headless: bool) -> Self {
+        self.config.headless = headless;
         self
     }
 

@@ -52,6 +52,7 @@ the same binary side by side:
 | `DEV_INVOKE_HOST` | `Builder::host` — an IP address, or `localhost` |
 | `DEV_INVOKE_PORT` | `Builder::port` |
 | `DEV_INVOKE_ALLOWED_ORIGINS` | `Builder::allowed_origins` — comma-separated, or `*` for any |
+| `DEV_INVOKE_HEADLESS` | `Builder::headless` — hides the app windows so it runs as a background relay |
 
 ```bash
 DEV_INVOKE_PORT=3031 npm run tauri dev
