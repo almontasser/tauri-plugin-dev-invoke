@@ -1,10 +1,11 @@
-# Tauri Dev Invoke API
+# tauri-plugin-dev-invoke-api
 
-JavaScript/TypeScript API adapter for `tauri-plugin-dev-invoke`.
+Browser-side half of [`tauri-plugin-dev-invoke`](https://crates.io/crates/tauri-plugin-dev-invoke).
 
-## Purpose
-
-Enables the standard `@tauri-apps/api` `invoke` function to work transparently in external browsers during development by routing requests to the local plugin server.
+Installs a stand-in for `window.__TAURI_INTERNALS__` that speaks HTTP to the plugin's dev
+server, so `@tauri-apps/api` and every Tauri plugin behave the same way in a browser tab as
+they do inside the app: `invoke()`, `listen()`, `Channel`, `getCurrentWindow()`,
+`convertFileSrc()` and binary payloads all work.
 
 ## Installation
 
@@ -12,22 +13,55 @@ Enables the standard `@tauri-apps/api` `invoke` function to work transparently i
 npm install tauri-plugin-dev-invoke-api
 ```
 
+The Rust crate has to be registered in your app for any of this to do anything:
+
+```toml
+[dependencies]
+tauri-plugin-dev-invoke = "0.3"
+```
+
 ## Usage
 
-Call `setupDevInvoke()` at the entry point of your application (e.g., `main.tsx` or `main.ts`).
+Call it once at your entry point. Inside the Tauri webview it is a no-op, so it is safe to
+leave in.
 
 ```typescript
 import { setupDevInvoke } from "tauri-plugin-dev-invoke-api";
 
-// Transparently patches __TAURI_INTERNALS__ in external browsers.
-// Has no effect in the Tauri WebView.
-setupDevInvoke();
+await setupDevInvoke();
 ```
 
-Then use Tauri as normal:
+Then use Tauri as you normally would:
 
 ```typescript
 import { invoke } from "@tauri-apps/api/core";
+import { listen } from "@tauri-apps/api/event";
 
-invoke("greet", { name: "World" }).then(console.log);
+await invoke("greet", { name: "World" });
+await listen("progress", (event) => console.log(event.payload));
 ```
+
+Awaiting the call means the window label and path separator are correct on the first render.
+If you would rather not await it, pass the label instead: `setupDevInvoke({ window: "main" })`.
+
+## Options
+
+```typescript
+await setupDevInvoke({
+    url: "http://localhost:3030", // dev server base URL
+    window: "main",               // window label to impersonate
+    debug: true,                  // log connection details
+    force: false,                 // patch even inside the Tauri webview
+});
+```
+
+It resolves to a handle with the server `metadata` and a `teardown()` that removes the shim.
+`isDevInvokeActive()` and `getDevInvokeHandle()` are also exported.
+
+See the [repository README](https://github.com/almontasser/tauri-plugin-dev-invoke) for the
+Rust-side options and how the callback bridge works.
+
+## License
+
+Licensed under either of [Apache License, Version 2.0](LICENSE-APACHE) or
+[MIT license](LICENSE-MIT) at your option.
