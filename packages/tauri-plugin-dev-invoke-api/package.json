@@ -1,17 +1,36 @@
 {
     "name": "tauri-plugin-dev-invoke-api",
-    "version": "0.2.0",
-    "description": "JavaScript API for tauri-plugin-dev-invoke",
+    "version": "0.3.0",
+    "description": "Run your Tauri app in a browser during development: commands, events, channels and assets over HTTP",
     "author": "Mahmoud Almontasser <almontasser@outlook.com>",
+    "license": "MIT OR Apache-2.0",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/almontasser/tauri-plugin-dev-invoke.git",
+        "directory": "packages/tauri-plugin-dev-invoke-api"
+    },
+    "homepage": "https://github.com/almontasser/tauri-plugin-dev-invoke#readme",
     "type": "module",
     "main": "dist/index.js",
+    "module": "dist/index.js",
     "types": "dist/index.d.ts",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js",
+            "default": "./dist/index.js"
+        }
+    },
+    "sideEffects": false,
     "files": [
         "dist",
-        "README.md"
+        "README.md",
+        "LICENSE-MIT",
+        "LICENSE-APACHE"
     ],
     "scripts": {
-        "build": "tsc"
+        "build": "tsc",
+        "prepublishOnly": "tsc"
     },
     "devDependencies": {
         "typescript": "^5.0.0"
@@ -23,7 +42,8 @@
         "tauri",
         "plugin",
         "dev",
-        "testing"
-    ],
-    "license": "MIT"
+        "browser",
+        "testing",
+        "invoke"
+    ]
 }
